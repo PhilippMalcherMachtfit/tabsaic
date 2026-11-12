@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <!-- Tabsaic icon: one eight-point star tile, drawn from scratch for this extension. -->
+  <defs>
+    <polygon id="star" points="50.00,0.00 35.36,14.64 35.36,35.36 14.64,35.36 0.00,50.00 -14.64,35.36 -35.36,35.36 -35.36,14.64 -50.00,0.00 -35.36,-14.64 -35.36,-35.36 -14.64,-35.36 -0.00,-50.00 14.64,-35.36 35.36,-35.36 35.36,-14.64"/>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="#fbf5e6" stroke="#e2cf9f" stroke-width="4"/>
+  <g transform="translate(64 64)">
+    <use href="#star" fill="#24509e" transform="scale(1.04)"/>
+    <use href="#star" fill="#fbf5e6" transform="rotate(22.5) scale(0.6)"/>
+    <use href="#star" fill="#1d7d71" transform="scale(0.4)"/>
+    <circle r="8" fill="#e2a52c"/>
+  </g>
+</svg>

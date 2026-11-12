@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>New tab</title>
+  <link rel="icon" href="icons/icon-32.png">
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <main>
+    <nav id="topics" aria-label="Topics"></nav>
+    <div id="find-bar">
+      <input id="find" type="text" autocomplete="off" spellcheck="false" aria-label="Find a link" placeholder="Find a link">
+      <span id="find-count"></span>
+    </div>
+    <section id="grid" class="grid"></section>
+    <footer class="footer">
+      <div class="credit">
+        <img src="icons/icon-32.png" alt="" width="18" height="18">
+        <span><strong>Tabsaic</strong> · inspired by mosaic</span>
+      </div>
+      <button id="undo" class="footer-button" hidden>Undo</button>
+      <div class="settings">
+        <button id="settings-open" class="footer-button icon-button" title="Settings" aria-label="Settings" aria-haspopup="menu" aria-expanded="false">
+          <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+            <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-dasharray="2.356 2.356"/>
+            <circle cx="8" cy="8" r="3.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+          </svg>
+        </button>
+        <div id="settings-menu" class="menu" role="menu" hidden>
+          <button id="import-open" role="menuitem">Import from bookmarks bar</button>
+          <button id="export-open" role="menuitem">Export backup</button>
+          <button id="restore-open" role="menuitem">Restore backup</button>
+          <button id="extensions-open" role="menuitem">Extensions</button>
+        </div>
+      </div>
+      <input id="restore-file" type="file" accept=".json,application/json" hidden>
+    </footer>
+  </main>
+
+  <dialog id="link-dialog">
+    <form id="link-form" method="dialog">
+      <h3 id="link-heading">Add link</h3>
+      <label>Address
+        <input id="link-url" required autocomplete="off" placeholder="github.com">
+      </label>
+      <label>Title
+        <input id="link-title" autocomplete="off" placeholder="Optional, defaults to the domain">
+      </label>
+      <div class="actions">
+        <button type="button" data-close>Cancel</button>
+        <button id="link-save" value="save" class="primary">Add</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="topic-dialog">
+    <form id="topic-form" method="dialog">
+      <h3>Rename topic</h3>
+      <label>Name
+        <input id="topic-name" required maxlength="30" autocomplete="off">
+      </label>
+      <div class="actions">
+        <button type="button" data-close>Cancel</button>
+        <button value="save" class="primary">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog">
+    <form id="confirm-form" method="dialog">
+      <h3 id="confirm-heading"></h3>
+      <p id="confirm-text"></p>
+      <div class="actions">
+        <button id="confirm-cancel" type="button" data-close>Cancel</button>
+        <button id="confirm-save" value="save" class="primary"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="newtab.js"></script>
+</body>
+</html>

@@ -1,0 +1,522 @@
+/* Tile layout. The tiles fill the window, so the page never scrolls.
+   --tile-max-height stops them from growing further on a tall window. */
+:root {
+  --columns: 4;
+  --tile-max-height: 240px;
+  --row-gap: clamp(12px, 4vh, 36px); /* space above and below the tile grid */
+
+  --tile-gap: 6px;
+  --tile-radius: 5px;
+
+  /* Glaze colors of the tiles. */
+  --blue: #24509e;
+  --green: #1d7d71;
+  --saffron: #e2a52c;
+  --terracotta: #b54a31;
+  --ink-on-glaze: #fbf5e6; /* text on blue, green and terracotta */
+  --ink-on-saffron: #3a2a05;
+
+  /* The page background is plain grout (--bg), so the tiles are the mosaic.
+     For the star pattern behind the page, set
+     --mosaic: url("mosaic.svg") (dark mode: "mosaic-dark.svg") and --veil: rgb(250 245 233 / 0.62). */
+  --mosaic: none;
+  --mosaic-size: 240px;
+  --veil: transparent;
+
+  --bg: #f1e9d6;
+  --card: #fffdf7;
+  --text: #2a2418;
+  --muted: #7a6f5a;
+  --line: #d9cdb2;
+  --accent: #24509e;
+  --accent-text: #fbf5e6;
+  --danger: #c0392b;
+  --shadow: 0 1px 2px rgb(60 40 0 / 0.12);
+  --shadow-hover: 0 4px 12px rgb(60 40 0 / 0.16), 0 12px 28px rgb(60 40 0 / 0.12);
+  --glaze-shine: inset 0 1px 0 rgb(255 255 255 / 0.22), inset 0 -3px 0 rgb(0 0 0 / 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --blue: #2a4f96;
+    --green: #1b6b61;
+    --saffron: #c9922a;
+    --terracotta: #a2452f;
+    --ink-on-glaze: #f4ecd8;
+    --ink-on-saffron: #2b1f04;
+
+    --bg: #121419;
+    --card: #23262e;
+    --text: #f1ead9;
+    --muted: #a39a86;
+    --line: #3d4049;
+    --accent: #7aa5ea;
+    --accent-text: #0b1a2a;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+    --shadow-hover: 0 6px 20px rgb(0 0 0 / 0.55);
+  }
+}
+
+@media (max-width: 760px) {
+  :root {
+    --columns: 2;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  background-color: var(--bg);
+  background-image: linear-gradient(var(--veil), var(--veil)), var(--mosaic);
+  background-size: auto, var(--mosaic-size);
+  background-attachment: fixed;
+  color: var(--text);
+  font: 15px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+/* One column that is exactly as tall as the window: topics, tile grid, bottom row.
+   Only the tile grid shrinks when the window gets smaller. */
+main {
+  max-width: 1240px;
+  height: 100%;
+  margin: 0 auto;
+  padding: clamp(14px, 5vh, 48px) 40px clamp(12px, 3vh, 28px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Topics */
+
+#topics,
+#find-bar {
+  flex: none;
+  min-height: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: var(--row-gap);
+}
+
+/* The find bar takes the place of the topics while you type. */
+#find-bar,
+body.finding #topics {
+  display: none;
+}
+
+body.finding #find-bar {
+  display: flex;
+}
+
+#find {
+  width: 260px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--tile-radius);
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  outline: 2px solid var(--accent);
+}
+
+#find-count {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.topic {
+  padding: 8px 20px;
+  border: 0;
+  border-radius: var(--tile-radius);
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.topic[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.topic.dragging {
+  opacity: 0.4;
+}
+
+.topic-edit {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--tile-radius);
+  background: var(--card);
+  color: var(--muted);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.topic-edit:hover,
+.topic-edit:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+/* Tiles */
+
+.grid {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  grid-auto-rows: minmax(0, var(--tile-max-height));
+  gap: var(--tile-gap);
+}
+
+/* Each slot has a fixed glaze color, so neighbors always differ. The order repeats every
+   8 slots and fits 4 columns: blue saffron green terracotta / green terracotta blue saffron. */
+.slot {
+  position: relative;
+  min-height: 0;
+  --glaze: var(--blue);
+  --glaze-ink: var(--ink-on-glaze);
+}
+
+.slot:nth-child(8n + 2),
+.slot:nth-child(8n + 8) {
+  --glaze: var(--saffron);
+  --glaze-ink: var(--ink-on-saffron);
+}
+
+.slot:nth-child(8n + 3),
+.slot:nth-child(8n + 5) {
+  --glaze: var(--green);
+}
+
+.slot:nth-child(8n + 4),
+.slot:nth-child(8n + 6) {
+  --glaze: var(--terracotta);
+}
+
+/* 2 columns on a narrow window: blue saffron / green terracotta. */
+@media (max-width: 760px) {
+  .slot:nth-child(4n + 1) {
+    --glaze: var(--blue);
+    --glaze-ink: var(--ink-on-glaze);
+  }
+
+  .slot:nth-child(4n + 2) {
+    --glaze: var(--saffron);
+    --glaze-ink: var(--ink-on-saffron);
+  }
+
+  .slot:nth-child(4n + 3) {
+    --glaze: var(--green);
+    --glaze-ink: var(--ink-on-glaze);
+  }
+
+  .slot:nth-child(4n + 4) {
+    --glaze: var(--terracotta);
+    --glaze-ink: var(--ink-on-glaze);
+  }
+}
+
+.tile {
+  width: 100%;
+  height: 100%;
+  padding: clamp(4px, 1.5vh, 16px) 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 1.2vh, 14px);
+  border: 0;
+  border-radius: var(--tile-radius);
+  background: var(--glaze);
+  box-shadow: var(--glaze-shine), var(--shadow);
+  color: var(--glaze-ink);
+  text-decoration: none;
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease, background-color 120ms ease;
+}
+
+a.tile:hover,
+a.tile:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.07);
+  box-shadow: var(--glaze-shine), var(--shadow-hover);
+  outline: none;
+}
+
+/* An empty slot is an unglazed tile: a faint tint of its glaze color. */
+.tile.empty {
+  border: 1.5px dashed color-mix(in srgb, var(--glaze) 55%, transparent);
+  background: color-mix(in srgb, var(--glaze) 9%, transparent);
+  box-shadow: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tile.empty:hover,
+.tile.empty:focus-visible {
+  border-style: solid;
+  border-color: var(--glaze);
+  background: color-mix(in srgb, var(--glaze) 20%, transparent);
+  color: var(--text);
+  outline: none;
+}
+
+.plus {
+  font-size: clamp(18px, 4vh, 36px);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.label {
+  max-width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow-wrap: anywhere;
+  text-align: center;
+  font-size: clamp(13px, 2.9vh, 22px);
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.tile.empty .label {
+  font-size: clamp(12px, 2vh, 15px);
+  font-weight: 600;
+}
+
+.tile-action {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.tile-action.edit {
+  right: 42px;
+}
+
+.slot:hover .tile-action,
+.tile-action:focus-visible {
+  opacity: 1;
+}
+
+.edit:hover {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.remove:hover {
+  background: var(--danger);
+  color: #ffffff;
+}
+
+/* Drag and drop */
+
+.slot.dragging {
+  opacity: 0.4;
+}
+
+.slot.dragging .tile-action {
+  opacity: 0;
+}
+
+.slot.drop-target .tile,
+.slot.first .tile,
+.topic.drop-target {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.footer {
+  flex: none;
+  margin-top: var(--row-gap);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.footer-button {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--tile-radius);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.footer-button:hover,
+.footer-button:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.icon-button {
+  padding: 6px 8px;
+  display: grid;
+  place-items: center;
+}
+
+/* The settings menu opens upwards from the gear button, on top of the page.
+   It takes no space in the layout, so the page still never scrolls. */
+.settings {
+  position: relative;
+}
+
+.menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  min-width: 210px;
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--tile-radius);
+  background: var(--card);
+  box-shadow: var(--shadow-hover);
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.menu button {
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.menu button:hover,
+.menu button:focus-visible {
+  background: var(--bg);
+  outline: none;
+}
+
+.credit {
+  padding: 6px 16px 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--tile-radius);
+  background: var(--card);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.credit strong {
+  color: var(--text);
+}
+
+/* Dialogs */
+
+dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 24px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow-hover);
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.35);
+}
+
+dialog h3 {
+  margin: 0 0 16px;
+  font-size: 17px;
+}
+
+dialog p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+dialog label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+dialog input {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+dialog input:focus {
+  border-color: transparent;
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.actions button {
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.actions .primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}

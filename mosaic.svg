@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Tabsaic background: eight-point star and cross tiling, drawn from scratch for this extension. -->
+  <!-- Change the colors here. -->
+  <style>
+    .cross { fill: #ecdcb4; }
+    .grout { stroke: #fbf5e6; stroke-width: 3.2; stroke-linejoin: round; }
+    .blue { fill: #24509e; }
+    .green { fill: #1d7d71; }
+    .inner { fill: #fbf5e6; }
+    .heart { fill: #e2a52c; }
+    .gem { fill: #c2553b; }
+  </style>
+  <defs>
+    <polygon id="star" points="50.00,0.00 35.36,14.64 35.36,35.36 14.64,35.36 0.00,50.00 -14.64,35.36 -35.36,35.36 -35.36,14.64 -50.00,0.00 -35.36,-14.64 -35.36,-35.36 -14.64,-35.36 -0.00,-50.00 14.64,-35.36 35.36,-35.36 35.36,-14.64"/>
+  </defs>
+  <rect class="cross" width="200" height="200"/>
+  <use href="#star" class="gem" transform="translate(0 0) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(100 0) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(200 0) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(0 100) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(100 100) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(200 100) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(0 200) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(100 200) rotate(22.5) scale(0.2)"/>
+  <use href="#star" class="gem" transform="translate(200 200) rotate(22.5) scale(0.2)"/>
+  <g transform="translate(50 50)">
+    <use href="#star" class="blue grout"/>
+    <use href="#star" class="inner" transform="rotate(22.5) scale(0.56)"/>
+    <use href="#star" class="blue" transform="scale(0.36)"/>
+    <circle r="6.5" class="heart"/>
+  </g>
+  <g transform="translate(150 50)">
+    <use href="#star" class="green grout"/>
+    <use href="#star" class="inner" transform="rotate(22.5) scale(0.56)"/>
+    <use href="#star" class="green" transform="scale(0.36)"/>
+    <circle r="6.5" class="heart"/>
+  </g>
+  <g transform="translate(50 150)">
+    <use href="#star" class="green grout"/>
+    <use href="#star" class="inner" transform="rotate(22.5) scale(0.56)"/>
+    <use href="#star" class="green" transform="scale(0.36)"/>
+    <circle r="6.5" class="heart"/>
+  </g>
+  <g transform="translate(150 150)">
+    <use href="#star" class="blue grout"/>
+    <use href="#star" class="inner" transform="rotate(22.5) scale(0.56)"/>
+    <use href="#star" class="blue" transform="scale(0.36)"/>
+    <circle r="6.5" class="heart"/>
+  </g>
+</svg>
