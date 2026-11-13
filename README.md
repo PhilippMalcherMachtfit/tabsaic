@@ -1,6 +1,6 @@
 # Tabsaic
 
-A new tab page for Edge and Chrome. Your links as big colored tiles, grouped by topic, on one page without scrolling. Inspired by mosaic.
+A new tab page for Edge and Chrome. Your links as big colored tiles, grouped by topic, on one page without scrolling.
 
 Your links stay in your browser. No account, no sync, no tracking.
 
